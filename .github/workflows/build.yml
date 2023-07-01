@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: windows-binary
-        path: ${{github.workspace}}\build\Release\libSerial_cpp.dll
+        path: ${{github.workspace}}\build\Release\Serial_cpp.dll
         
   commit:
     needs: [build_windows, build_linux]
