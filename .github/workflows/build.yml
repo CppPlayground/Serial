@@ -29,7 +29,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: linux-binary
-        path: ${{github.workspace}}/build/liblibSerial_cpp.so
+        path: ${{github.workspace}}/build/libSerial_cpp.so
         
   build_windows:
     name: Build win64 binaries
