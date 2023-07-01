@@ -70,10 +70,10 @@ jobs:
         run: mkdir -p ${{github.workspace}}/bin
         
       - name: Move and rename linux binary
-        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/bin/linux.so
+        run: mv ${{github.workspace}}/tmp/linux-binary/libSerial_cpp.so ${{github.workspace}}/bin/linux.so
         
       - name: Move and rename windows binary
-        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/bin/windows.dll
+        run: mv ${{github.workspace}}/tmp/windows-binary/Serial_cpp.dll ${{github.workspace}}/bin/windows.dll
         
       - name: Configure Git
         run: |
