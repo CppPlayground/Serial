@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 1)
+set(VERSION_PATCH 0)
+
 set(PROJECT_N Serial_cpp)
-project(${PROJECT_N} VERSION 1.0)
+project(${PROJECT_N} VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -40,5 +44,9 @@ if(LIB)
 else()
     add_executable(${PROJECT_N} ${SRCS}) 
 endif(LIB)
+
+set_target_properties(${PROJECT_N} PROPERTIES 
+                              VERSION ${PROJECT_VERSION}
+                            SOVERSION ${PROJECT_VERSION_MAJOR})
 
 target_include_directories(${PROJECT_N} PUBLIC include)
