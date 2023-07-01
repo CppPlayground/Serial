@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(VERSION_MAJOR 0)
+set(VERSION_MINOR 1)
+set(VERSION_PATCH 0)
+
 set(PROJECT_N Serial_cpp)
-project(${PROJECT_N} VERSION 1.0)
+project(${PROJECT_N} VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -9,6 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 set(LIB true)
+
+configure_file(versioning/version_config.h.in ${PROJECT_SOURCE_DIR}/include/version_config.h)
 
 # a macro that gets all of the header containing directories. 
 MACRO(header_directories return_list includes_base_folder extention )
@@ -40,5 +46,9 @@ if(LIB)
 else()
     add_executable(${PROJECT_N} ${SRCS}) 
 endif(LIB)
+
+set_target_properties(${PROJECT_N} PROPERTIES 
+                              VERSION ${PROJECT_VERSION}
+                            SOVERSION ${PROJECT_VERSION_MAJOR})
 
 target_include_directories(${PROJECT_N} PUBLIC include)

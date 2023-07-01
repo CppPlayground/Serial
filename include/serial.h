@@ -2,6 +2,7 @@
 #include <string>
 
 #include "status_codes.h"
+#include "version_config.h"
 
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
@@ -21,6 +22,10 @@ extern void (*writeCallback)(int bytes);
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    MODULE_API inline auto serialVersionMajor() -> unsigned int {return getMajorVersion();};
+    MODULE_API inline auto serialVersionMinor() -> unsigned int {return getMinorVersion();};
+    MODULE_API inline auto serialVersionPatch() -> unsigned int {return getPatchVersion();};
 
     MODULE_API auto serialOpen(
         void* port,

@@ -1,2 +1,3 @@
 build/*
 .cache
+version_config.h
