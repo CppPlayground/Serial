@@ -14,7 +14,7 @@ file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 set(LIB true)
 
-configure_file( versioning/version_config.h.in ${PROJECT_SOURCE_DIR}/include/version_config.h )
+configure_file(versioning/version_config.h.in ${PROJECT_SOURCE_DIR}/include/version_config.h)
 
 # a macro that gets all of the header containing directories. 
 MACRO(header_directories return_list includes_base_folder extention )
