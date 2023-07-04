@@ -1,0 +1,16 @@
+#include "serial.h"
+
+unsigned int getMajorVersion()
+{
+    return @VERSION_MAJOR@;
+}
+
+unsigned int getMinorVersion()
+{
+    return @VERSION_MINOR@;
+}
+
+unsigned int getPatchVersion()
+{
+    return @VERSION_PATCH@;
+}
