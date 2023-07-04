@@ -29,7 +29,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: linux-binary
-        path: ${{github.workspace}}/build/libSerial_cpp.so
+        path: ${{github.workspace}}/build/**.so**
         
   build_windows:
     name: Build win64 binaries
@@ -70,7 +70,7 @@ jobs:
         run: mkdir -p ${{github.workspace}}/bin
         
       - name: Move and rename linux binary
-        run: mv ${{github.workspace}}/tmp/linux-binary/libSerial_cpp.so ${{github.workspace}}/bin/linux.so
+        run: mv ${{github.workspace}}/tmp/linux-binary/* ${{github.workspace}}/bin/
         
       - name: Move and rename windows binary
         run: mv ${{github.workspace}}/tmp/windows-binary/Serial_cpp.dll ${{github.workspace}}/bin/windows.dll

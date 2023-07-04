@@ -17,4 +17,7 @@ enum class StatusCodes {
     ABORT_WRITE_ERROR = -13,
 };
 
-#define status(status) static_cast<int>(status)
+template <typename T>
+constexpr auto status(const T& stat) -> int {
+    return static_cast<int>(stat);
+}
