@@ -1,29 +1,29 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include <windows.h>
-#include "serial.h"
+
 #include "error/error.h"
 #include "error/init_comm_state_errors.h"
 #include "error/init_timeouts_errors.h"
 #include "error/open_errors.h"
+#include "serial.h"
+
 
 namespace {
 COMMTIMEOUTS timeouts = {0};
-std::string data;
-}
+std::string  data;
+}  // namespace
 
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
 void (*writeCallback)(int bytes);
 
-auto serialInitCommState(
-    int64_t handle,
-    const int baudrate,
-    const int dataBits,
-    const int parity,
-    const int stopBits
-) -> int {
+auto serialInitCommState(int64_t   handle,
+                         const int baudrate,
+                         const int dataBits,
+                         const int parity,
+                         const int stopBits) -> int {
     HANDLE hSerialPort = reinterpret_cast<void*>(handle);
-    DCB dcbSerialParams = {0};
+    DCB    dcbSerialParams = {0};
 
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
         return error(initCommStateErrors::GET_COMM_STATE);
@@ -42,21 +42,19 @@ auto serialInitCommState(
     return 0;
 }
 
-auto serialInitTimeouts(
-    int64_t handle,
-    const int readIntervalTimeout,
-    const int readTotalTimeoutConstant,
-    const int readTotalTimeoutMultiplier,
-    const int writeTotalTimeoutConstant,
-    const int writeTotalTimeoutMultiplier
-) -> int {
-    HANDLE hSerialPort = reinterpret_cast<void*>(handle);
+auto serialInitTimeouts(int64_t   handle,
+                        const int readIntervalTimeout,
+                        const int readTotalTimeoutConstant,
+                        const int readTotalTimeoutMultiplier,
+                        const int writeTotalTimeoutConstant,
+                        const int writeTotalTimeoutMultiplier) -> int {
+    HANDLE       hSerialPort = reinterpret_cast<void*>(handle);
     COMMTIMEOUTS timeouts = {0};
 
     if (!GetCommTimeouts(hSerialPort, &timeouts)) {
         return error(initTimeoutsErrors::GET_COMM_TIMEOUTS);
     }
-    
+
     timeouts.ReadIntervalTimeout = readIntervalTimeout;
     timeouts.ReadTotalTimeoutConstant = readTotalTimeoutConstant;
     timeouts.ReadTotalTimeoutMultiplier = writeTotalTimeoutConstant;
@@ -73,17 +71,15 @@ auto serialInitTimeouts(
 auto serialOpen(void* port) -> int64_t {
     HANDLE hSerialPort;
 
-    char *portName = static_cast<char*>(port);
+    char* portName = static_cast<char*>(port);
 
-    hSerialPort = CreateFile(
-        portName,
-        GENERIC_READ | GENERIC_WRITE,
-        0,
-        NULL,
-        OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL
-    );
+    hSerialPort = CreateFile(portName,
+                             GENERIC_READ | GENERIC_WRITE,
+                             0,
+                             NULL,
+                             OPEN_EXISTING,
+                             FILE_ATTRIBUTE_NORMAL,
+                             NULL);
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
@@ -109,13 +105,11 @@ void serialClose(int64_t pointer) {
     }
 }
 
-auto serialRead(
-    int64_t pointer,
-    void* buffer,
-    const int bufferSize,
-    const int timeout,
-    const int multiplier
-) -> int {
+auto serialRead(int64_t   pointer,
+                void*     buffer,
+                const int bufferSize,
+                const int timeout,
+                const int multiplier) -> int {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     // Error if handle is invalid
@@ -141,19 +135,17 @@ auto serialRead(
         errorCallback(status(StatusCodes::READ_ERROR));
         return 0;
     }
-    
+
     readCallback(bytesRead);
     return bytesRead;
 }
 
-auto serialReadUntil(
-    int64_t pointer,
-    void* buffer,
-    const int bufferSize,
-    const int timeout,
-    const int multiplier,
-    void* searchString
-) -> int {
+auto serialReadUntil(int64_t   pointer,
+                     void*     buffer,
+                     const int bufferSize,
+                     const int timeout,
+                     const int multiplier,
+                     void*     searchString) -> int {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     // Error if handle is invalid
@@ -174,12 +166,19 @@ auto serialReadUntil(
 
     data = "";
 
-    for (int i{0}; i < bufferSize && data.find(std::string(static_cast<char*>(searchString))) == std::string::npos; i++) {
+    for (int i{0}; i < bufferSize &&
+                   data.find(std::string(static_cast<char*>(searchString))) ==
+                       std::string::npos;
+         i++) {
         DWORD bytesRead;
-        char bufferChar[1];
+        char  bufferChar[1];
 
         // Error if read fails
-        if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
+        if (!ReadFile(hSerialPort,
+                      bufferChar,
+                      sizeof(bufferChar),
+                      &bytesRead,
+                      NULL)) {
             errorCallback(status(StatusCodes::READ_ERROR));
             return 0;
         }
@@ -197,13 +196,11 @@ auto serialReadUntil(
     return data.length();
 }
 
-auto serialWrite(
-    int64_t pointer,
-    void* buffer,
-    const int bufferSize,
-    const int timeout,
-    const int multiplier
-) -> int {
+auto serialWrite(int64_t   pointer,
+                 void*     buffer,
+                 const int bufferSize,
+                 const int timeout,
+                 const int multiplier) -> int {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     DWORD bytesWritten = 0;
@@ -222,23 +219,26 @@ auto serialWrite(
         errorCallback(status(StatusCodes::WRITE_ERROR));
         return 0;
     }
-    
+
     writeCallback(bytesWritten);
     return bytesWritten;
 }
 
-auto serialGetPortsInfo(
-    void* buffer,
-    const int bufferSize,
-    void* separator
-) -> int {
+auto serialGetPortsInfo(void* buffer, const int bufferSize, void* separator)
+    -> int {
     std::string result;
-    
+
     int portsCounter = 0;
 
     for (int i = 1; i <= 256; ++i) {
         std::string portName = "COM" + std::to_string(i);
-        HANDLE hPort = CreateFileA(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+        HANDLE      hPort = CreateFileA(portName.c_str(),
+                                   GENERIC_READ | GENERIC_WRITE,
+                                   0,
+                                   NULL,
+                                   OPEN_EXISTING,
+                                   0,
+                                   NULL);
         // Error if open fails
         if (hPort == INVALID_HANDLE_VALUE) {
             CloseHandle(hPort);
@@ -263,13 +263,13 @@ auto serialGetPortsInfo(
     }
 
     memcpy(buffer, result.c_str(), result.length() + 1);
-    
+
     return portsCounter;
 }
 
 void serialClearBufferIn(int64_t pointer) {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
-    if (!PurgeComm(hSerialPort, PURGE_RXCLEAR)){
+    if (!PurgeComm(hSerialPort, PURGE_RXCLEAR)) {
         errorCallback(status(StatusCodes::CLEAR_BUFFER_IN_ERROR));
         return;
     }
@@ -278,7 +278,7 @@ void serialClearBufferIn(int64_t pointer) {
 
 void serialClearBufferOut(int64_t pointer) {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
-    if (!PurgeComm(hSerialPort, PURGE_TXCLEAR)){
+    if (!PurgeComm(hSerialPort, PURGE_TXCLEAR)) {
         errorCallback(status(StatusCodes::CLEAR_BUFFER_OUT_ERROR));
         return;
     }
@@ -287,7 +287,7 @@ void serialClearBufferOut(int64_t pointer) {
 
 void serialAbortRead(int64_t pointer) {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
-    if (!PurgeComm(hSerialPort, PURGE_RXABORT)){
+    if (!PurgeComm(hSerialPort, PURGE_RXABORT)) {
         errorCallback(status(StatusCodes::ABORT_READ_ERROR));
         return;
     }
@@ -296,23 +296,17 @@ void serialAbortRead(int64_t pointer) {
 
 void serialAbortWrite(int64_t pointer) {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
-    if (!PurgeComm(hSerialPort, PURGE_TXABORT)){
+    if (!PurgeComm(hSerialPort, PURGE_TXABORT)) {
         errorCallback(status(StatusCodes::ABORT_WRITE_ERROR));
         return;
     }
     return;
 }
 
-auto serialOnError(void (*func)(int code)) -> void {
-    errorCallback = func;
-};
+auto serialOnError(void (*func)(int code)) -> void { errorCallback = func; };
 
-auto serialOnRead(void (*func)(int bytes)) -> void {
-    readCallback = func;
-};
+auto serialOnRead(void (*func)(int bytes)) -> void { readCallback = func; };
 
-auto serialOnWrite(void (*func)(int bytes)) -> void {
-    writeCallback = func;
-};
+auto serialOnWrite(void (*func)(int bytes)) -> void { writeCallback = func; };
 
 #endif

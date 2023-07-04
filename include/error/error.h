@@ -1,3 +1,6 @@
 #pragma once
 
-#define error(status) static_cast<int>(status)
+template <typename T>
+constexpr auto error(const T& stat) -> int {
+    return static_cast<int>(stat);
+}
